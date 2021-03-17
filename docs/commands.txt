@@ -41,3 +41,16 @@ sudo mount /dev/mmcblk0p1 /boot
 sudo raspi-config
 ls /dev/i2c*  ==> responds with /dev/i2c-1, indicating that i2c is enabled
 sudo raspi-config ==> Go to Advanced Setting => Enable I2C
+
+##  I2C-tools, which will tell us the I2C address of the LCD
+sudo apt-get install i2c-tools
+i2cdetect -y 1
+
+
+## Referemces
+https://github.com/fdebrabander/Arduino-LiquidCrystal-I2C-library ==> Arduino LCD library
+https://roboticsbackend.com/wiringpi-i2c-tutorial-rasperry-pi-adxl345/ ==> Raspberry Pi LCD wiring example
+https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.explicit.bing.net%2Fth%3Fid%3DOIP.Z3G18q4SjpDUhyQwdHlt4QHaFZ%26pid%3DApi&f=1 ==> How LCD pixels are distributed
+https://swimburger.net/blog/dotnet/how-to-run-a-dotnet-core-console-app-as-a-service-using-systemd-on-linux ==> Create dotnet core console app as a systemd service
+https://github.com/unosquare/raspberryio#run-the-app-on-the-raspberry ==> Raspberry Pi IO library in dotnet core
+
