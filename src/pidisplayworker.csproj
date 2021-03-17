@@ -10,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="ConsoleDump" Version="0.7.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="5.0.1" />
     <PackageReference Include="Unosquare.Raspberry.Abstractions" Version="0.4.1" />
     <PackageReference Include="Unosquare.Raspberry.IO" Version="0.27.1" />
     <PackageReference Include="Unosquare.WiringPi" Version="0.5.1" />

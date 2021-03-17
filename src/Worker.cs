@@ -31,6 +31,14 @@ namespace pidisplayworker
             DomainBlocked = DNSQueryToday = AdsBlocked = AdsBlockedPercentage = string.Empty;
         }
 
+        public override Task StopAsync(CancellationToken cancellationToken)
+        {
+            lcd.ClearLCD();
+            _logger.LogInformation("Worker stopping at: {time}", DateTimeOffset.Now);
+            _ = $"Domains Blocked : {DomainBlocked} | DNS Queries Today : {DNSQueryToday} | Ads Blocked : {AdsBlocked} | Ads Percentage {AdsBlockedPercentage}".Dump("Last Statistics");
+            return base.StopAsync(cancellationToken);
+        }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
@@ -62,7 +70,8 @@ namespace pidisplayworker
                 {
                     if (ex is TaskCanceledException)
                     {
-                        _logger.LogError("Worker stopping at: {time}", DateTimeOffset.Now);
+                        _logger.LogInformation("Worker stopping at: {time}", DateTimeOffset.Now);
+                        _ = $"Domains Blocked : {DomainBlocked} | DNS Queries Today : {DNSQueryToday} | Ads Blocked : {AdsBlocked} | Ads Percentage {AdsBlockedPercentage}".Dump("Last Statistics");
                     }
                     else
                     {
