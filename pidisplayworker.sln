@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31112.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "pidisplayworker", "src\pidisplayworker.csproj", "{C412DBCB-766E-4E9E-877F-71D5D7664EB6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{9112C3C1-4385-4665-9BEE-9A2D1E365C20}"
+	ProjectSection(SolutionItems) = preProject
+		docs\commands.txt = docs\commands.txt
+		readme.md = readme.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C412DBCB-766E-4E9E-877F-71D5D7664EB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C412DBCB-766E-4E9E-877F-71D5D7664EB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C412DBCB-766E-4E9E-877F-71D5D7664EB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C412DBCB-766E-4E9E-877F-71D5D7664EB6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8BD8E9E1-3933-4F2D-ADCE-0EE67A42B20F}
+	EndGlobalSection
+EndGlobal

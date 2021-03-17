@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "pidisplayworker": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      },
+      "remoteDebugEnabled": false,
+      "dotnetRunMessages": "true",
+      "authenticationMode": "Windows"
+    }
+  }
+}

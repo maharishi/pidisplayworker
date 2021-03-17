@@ -1,0 +1,43 @@
+dotnet add package Unosquare.WiringPi 
+dotnet add package Unosquare.RaspberryIO.Peripherals
+dotnet add package ConsoleDump
+
+dotnet clean
+dotnet build
+dotnet run
+
+## Command to create the publish the dll for OS specific dll
+dotnet publish -c release -r ubuntu.20.04-arm --self-contained
+
+
+## Ubuntu Commands to get the gpio enabled on Ubuntu for Raspberry Pi
+groups
+groups ubuntu
+less /etc/group
+ls -lL /sys/class/gpio/
+groupadd gpio
+sudo groupadd gpio
+sudo usermod -a -G gpio
+sudo usermod -a -G gpio ubuntu
+grep gpio /etc/group
+/etc/rc.local
+ll /sys/class/gpio
+chown -R root:gpio /sys/class/gpio
+sudo chown -R root:gpio /sys/class/gpio
+sudo chmod -R ug+rw /sys/class/gpio
+sudo nano /etc/udev/rules.d/80-gpio-noroot.rules
+sudo chown root:gpio /dev/gpiomem
+sudo chmod g+rw /dev/gpiomem
+sudo adduser ubuntu gpio
+
+## Get I2C module enabled for Ubuntu for Raspberry Pi
+https://askubuntu.com/questions/1130052/enable-i2c-on-raspberry-pi-ubuntu
+https://github.com/EmilGus/install_raspi-config
+wget https://archive.raspberrypi.org/debian/pool/main/r/raspi-config/raspi-config_20160527_all.deb -P /tmp
+apt-get install libnewt0.52 whiptail parted triggerhappy lua5.1 alsa-utils -y
+apt-get install -fy
+dpkg -i /tmp/raspi-config_20160527_all.deb
+sudo mount /dev/mmcblk0p1 /boot
+sudo raspi-config
+ls /dev/i2c*  ==> responds with /dev/i2c-1, indicating that i2c is enabled
+sudo raspi-config ==> Go to Advanced Setting => Enable I2C
