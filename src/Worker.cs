@@ -22,18 +22,25 @@ namespace pidisplayworker
         private string AdsBlocked { get; set;}
         private string AdsBlockedPercentage { get; set; }
 
-        private LiquidCrystal_I2C lcd { get; set; }
+        private readonly ILiquidCrystal_I2C _lcd;
 
-        public Worker(ILogger<Worker> logger)
+        private readonly IDHT11 _dHT; 
+
+        private readonly string PiHoleURL;
+    
+        public Worker(ILogger<Worker> logger, ILiquidCrystal_I2C lcd_, IDHT11 dHT_, string url_)
         {
             _logger = logger;
-            lcd = LiquidCrystal_I2C.Instance(0x3f);
+            _lcd = lcd_;
+            PiHoleURL = url_;
+            _dHT = dHT_;
             DomainBlocked = DNSQueryToday = AdsBlocked = AdsBlockedPercentage = string.Empty;
         }
+        
 
         public override Task StopAsync(CancellationToken cancellationToken)
         {
-            lcd.ClearLCD();
+            _lcd.ClearLCD();
             _logger.LogInformation("Worker stopping at: {time}", DateTimeOffset.Now);
             _ = $"Domains Blocked : {DomainBlocked} | DNS Queries Today : {DNSQueryToday} | Ads Blocked : {AdsBlocked} | Ads Percentage {AdsBlockedPercentage}".Dump("Last Statistics");
             return base.StopAsync(cancellationToken);
@@ -41,29 +48,64 @@ namespace pidisplayworker
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            int counter = 0;
             _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
-                    using (HttpClient client = new HttpClient())
+                    if (counter > 0)
                     {
-                        var res = client.GetStringAsync(Properties.Resources.PiHoleURL).Result;
-                        var jsonDoc = JsonDocument.Parse(Encoding.Default.GetBytes(res.ToString()));
-                        DomainBlocked = jsonDoc.RootElement.GetProperty("domains_being_blocked").GetString(); //.Dump("Domains Blocked");
-                        DNSQueryToday = jsonDoc.RootElement.GetProperty("dns_queries_today").GetString(); //.Dump("DNS Queries Today");
-                        AdsBlocked = jsonDoc.RootElement.GetProperty("ads_blocked_today").GetString(); //.Dump("Ads Blocked");
-                        AdsBlockedPercentage = jsonDoc.RootElement.GetProperty("ads_percentage_today").GetString(); //.Dump("Ads Percentage");
+                        using (HttpClient client = new HttpClient())
+                        {
+                            var res = client.GetStringAsync(PiHoleURL).Result;
+                            var jsonDoc = JsonDocument.Parse(Encoding.Default.GetBytes(res.ToString()));
+                            DomainBlocked = jsonDoc.RootElement.GetProperty("domains_being_blocked").GetString(); //.Dump("Domains Blocked");
+                            DNSQueryToday = jsonDoc.RootElement.GetProperty("dns_queries_today").GetString(); //.Dump("DNS Queries Today");
+                            AdsBlocked = jsonDoc.RootElement.GetProperty("ads_blocked_today").GetString(); //.Dump("Ads Blocked");
+                            AdsBlockedPercentage = jsonDoc.RootElement.GetProperty("ads_percentage_today").GetString(); //.Dump("Ads Percentage");
+                        }
+
+                        _lcd.CursorLine(LiquidCrystal_I2C.LINE1);
+                        _lcd.PrintLine($"Ad Domans: {DomainBlocked,9}");
+                        _lcd.CursorLine(LiquidCrystal_I2C.LINE2);
+                        _lcd.PrintLine($"DNS Qry2D: {DNSQueryToday,9}");
+                        _lcd.CursorLine(LiquidCrystal_I2C.LINE3);
+                        _lcd.PrintLine($"Ads Blokd: {AdsBlocked,9}");
+                        _lcd.CursorLine(LiquidCrystal_I2C.LINE4);
+                        _lcd.PrintLine($"Ads Blok%: {$"{AdsBlockedPercentage}%",9}");
+
+                        if (counter != 5)
+                        {
+                            counter++;
+                        }
+                        else
+                        {
+                            counter = -1;
+                        }
+                    }
+                    else
+                    {
+
+                        _lcd.CursorLine(LiquidCrystal_I2C.LINE1);
+                        _lcd.PrintLine($"Temperature : { _dHT.ReadTemperature(false).Result,3:0.00}C");
+                        _lcd.CursorLine(LiquidCrystal_I2C.LINE2);
+                        _lcd.PrintLine($"Humidity    : { _dHT.ReadHumidity().Result,3:0.00}%");
+                        _lcd.CursorLine(LiquidCrystal_I2C.LINE3);
+                        _lcd.PrintLine("".PadLeft(20));
+                        _lcd.CursorLine(LiquidCrystal_I2C.LINE4);
+                        _lcd.PrintLine("".PadLeft(20));
+
+                        if (counter != -5)
+                        {
+                            counter--;
+                        }
+                        else
+                        {
+                            counter = 1;
+                        }
                     }
 
-                    lcd.CursorLine(LiquidCrystal_I2C.LINE1);
-                    lcd.PrintLine("Ad Domans: " + DomainBlocked.PadLeft(9));
-                    lcd.CursorLine(LiquidCrystal_I2C.LINE2);
-                    lcd.PrintLine("DNS Qry2D: " + DNSQueryToday.PadLeft(9));
-                    lcd.CursorLine(LiquidCrystal_I2C.LINE3);
-                    lcd.PrintLine("Ads Blokd: " + AdsBlocked.PadLeft(9));
-                    lcd.CursorLine(LiquidCrystal_I2C.LINE4);
-                    lcd.PrintLine("Ads Blok%: " + $"{AdsBlockedPercentage}%".PadLeft(9));
                     await Task.Delay(1000, stoppingToken);
                 }
                 catch (Exception ex)
