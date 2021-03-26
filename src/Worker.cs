@@ -27,7 +27,7 @@ namespace pidisplayworker
         private readonly IDHT11 _dHT; 
 
         private readonly string PiHoleURL;
-    
+
         public Worker(ILogger<Worker> logger, ILiquidCrystal_I2C lcd_, IDHT11 dHT_, string url_)
         {
             _logger = logger;
@@ -66,6 +66,14 @@ namespace pidisplayworker
                             AdsBlockedPercentage = jsonDoc.RootElement.GetProperty("ads_percentage_today").GetString(); //.Dump("Ads Percentage");
                         }
 
+                        if (_logger.IsEnabled(LogLevel.Trace))
+                        {
+                            _logger.LogTrace($"Ad Domans: {DomainBlocked,9}");
+                            _logger.LogTrace($"DNS Qry2D: {DNSQueryToday,9}");
+                            _logger.LogTrace($"Ads Blokd: {AdsBlocked,9}");
+                            _logger.LogTrace($"Ads Blok%: {$"{AdsBlockedPercentage}%",9}");
+                        }
+
                         _lcd.CursorLine(LiquidCrystal_I2C.LINE1);
                         _lcd.PrintLine($"Ad Domans: {DomainBlocked,9}");
                         _lcd.CursorLine(LiquidCrystal_I2C.LINE2);
@@ -86,11 +94,16 @@ namespace pidisplayworker
                     }
                     else
                     {
+                        if (_logger.IsEnabled(LogLevel.Trace))
+                        {
+                            _logger.LogTrace($"Temperature : { _dHT.ReadTemperature(false).Result,4:#0.00}C");
+                            _logger.LogTrace($"Humidity    : { _dHT.ReadHumidity().Result,4:#0.00}%");
+                        }
 
                         _lcd.CursorLine(LiquidCrystal_I2C.LINE1);
-                        _lcd.PrintLine($"Temperature : { _dHT.ReadTemperature(false).Result,3:0.00}C");
+                        _lcd.PrintLine($"Temperature : { _dHT.ReadTemperature(false).Result,4:#0.00}C");
                         _lcd.CursorLine(LiquidCrystal_I2C.LINE2);
-                        _lcd.PrintLine($"Humidity    : { _dHT.ReadHumidity().Result,3:0.00}%");
+                        _lcd.PrintLine($"Humidity    : { _dHT.ReadHumidity().Result,4:#0.00}%");
                         _lcd.CursorLine(LiquidCrystal_I2C.LINE3);
                         _lcd.PrintLine("".PadLeft(20));
                         _lcd.CursorLine(LiquidCrystal_I2C.LINE4);
