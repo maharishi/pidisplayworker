@@ -9,7 +9,7 @@ using Unosquare.WiringPi;
 
 namespace pidisplayworker
 {
-    public class LiquidCrystal_I2C
+    public class LiquidCrystal_I2C : ILiquidCrystal_I2C
     {
         // Define some device constants
         public const int LCD_CHR = 1; // Mode - Sending data
@@ -29,24 +29,15 @@ namespace pidisplayworker
 
         I2CDevice Device { get; set; }
 
-        private LiquidCrystal_I2C()
+        public LiquidCrystal_I2C(I2CDevice _device)
         {
-
-        }
-
-        public static LiquidCrystal_I2C Instance(int deviceid)
-        {
-            var lcd = new LiquidCrystal_I2C();
             try
             {
-                Pi.Init<BootstrapWiringPi>();
-                Pi.I2C.AddDevice(deviceid);
-                lcd.Device = (I2CDevice)Pi.I2C.Devices[0];
-                lcd.LCD_BackLight = LCD_BACKLIGHT_ON;
-                lcd.LCDInit();
+                this.Device = _device;
+                this.LCD_BackLight = LCD_BACKLIGHT_ON;
+                this.LCDInit();
             }
             catch { }
-            return lcd;
         }
 
         private void LCDInit()

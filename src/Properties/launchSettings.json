@@ -2,6 +2,7 @@
   "profiles": {
     "pidisplayworker": {
       "commandName": "Project",
+      "commandLineArgs": "debug http://ubuntu.zion.com/admin/api.php?summary",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       },
