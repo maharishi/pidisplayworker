@@ -22,6 +22,8 @@ namespace pidisplayworker
         private string AdsBlocked { get; set;}
         private string AdsBlockedPercentage { get; set; }
 
+        private DHT11Data LastResult { get; set; }
+
         private readonly ILiquidCrystal_I2C _lcd;
 
         private readonly IDHT11 _dHT; 
@@ -42,7 +44,8 @@ namespace pidisplayworker
         {
             _lcd.ClearLCD();
             _logger.LogInformation("Worker stopping at: {time}", DateTimeOffset.Now);
-            _ = $"Domains Blocked : {DomainBlocked} | DNS Queries Today : {DNSQueryToday} | Ads Blocked : {AdsBlocked} | Ads Percentage {AdsBlockedPercentage}".Dump("Last Statistics");
+            _logger.LogInformation($"Domains Blocked : {DomainBlocked} | DNS Queries Today : {DNSQueryToday} | Ads Blocked : {AdsBlocked} | Ads Percentage {AdsBlockedPercentage}");
+            _logger.LogInformation($"Temp C : {LastResult.Temperature} | Temp F : {LastResult.TemperatureFarenheight} | Humidity : {LastResult.Humidity:P0} | Heat Index : {LastResult.HeatIndex}");
             return base.StopAsync(cancellationToken);
         }
 
@@ -91,23 +94,28 @@ namespace pidisplayworker
                         {
                             counter = -1;
                         }
+                        await Task.Delay(1000, stoppingToken);
                     }
                     else
                     {
+                        LastResult = _dHT.RetrieveSensorData();
+                        //dhtData.Dump("DHData");
                         if (_logger.IsEnabled(LogLevel.Trace))
                         {
-                            _logger.LogTrace($"Temperature : { _dHT.ReadTemperature(false).Result,4:#0.00}C");
-                            _logger.LogTrace($"Humidity    : { _dHT.ReadHumidity().Result,4:#0.00}%");
+                            _logger.LogTrace($"Temp C      : { LastResult.Temperature,4:#0.00}°C");
+                            _logger.LogTrace($"Humidity    : { LastResult.Humidity,4:P0}%");
+                            _logger.LogTrace($"Temp F      : { LastResult.Temperature,4:#0.00}°F");
+                            _logger.LogTrace($"Heat Index  : { LastResult.Humidity,4:#0.00}");
                         }
 
                         _lcd.CursorLine(LiquidCrystal_I2C.LINE1);
-                        _lcd.PrintLine($"Temperature : { _dHT.ReadTemperature(false).Result,4:#0.00}C");
+                        _lcd.PrintLine($"Temp C      : { LastResult.Temperature,6:#0.00}");
                         _lcd.CursorLine(LiquidCrystal_I2C.LINE2);
-                        _lcd.PrintLine($"Humidity    : { _dHT.ReadHumidity().Result,4:#0.00}%");
+                        _lcd.PrintLine($"Temp F      : { LastResult.TemperatureFarenheight,6:#0.00}");
                         _lcd.CursorLine(LiquidCrystal_I2C.LINE3);
-                        _lcd.PrintLine("".PadLeft(20));
+                        _lcd.PrintLine($"Humidity    : { LastResult.Humidity,6:P0}");
                         _lcd.CursorLine(LiquidCrystal_I2C.LINE4);
-                        _lcd.PrintLine("".PadLeft(20));
+                        _lcd.PrintLine($"Heat Index  : { LastResult.HeatIndex,6:#0.00}");
 
                         if (counter != -5)
                         {
@@ -117,9 +125,9 @@ namespace pidisplayworker
                         {
                             counter = 1;
                         }
-                    }
 
-                    await Task.Delay(1000, stoppingToken);
+                        await Task.Delay(2000, stoppingToken);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -127,11 +135,13 @@ namespace pidisplayworker
                     {
                         _logger.LogInformation("Worker stopping at: {time}", DateTimeOffset.Now);
                         _ = $"Domains Blocked : {DomainBlocked} | DNS Queries Today : {DNSQueryToday} | Ads Blocked : {AdsBlocked} | Ads Percentage {AdsBlockedPercentage}".Dump("Last Statistics");
+                        _ = $"Temp C : {LastResult.Temperature} | Temp F : {LastResult.TemperatureFarenheight} | Humidity : {LastResult.Humidity:P0} | Heat Index : {LastResult.HeatIndex}".Dump("Last Temp & Humidity");
                     }
                     else
                     {
                         _logger.LogError("Worker error at: {time}", DateTimeOffset.Now);
                         _ = $"Domains Blocked : {DomainBlocked} | DNS Queries Today : {DNSQueryToday} | Ads Blocked : {AdsBlocked} | Ads Percentage {AdsBlockedPercentage}".Dump("Last Statistics");
+                        _ = $"Temp C : {LastResult.Temperature} | Temp F : {LastResult.TemperatureFarenheight} | Humidity : {LastResult.Humidity:P0} | Heat Index : {LastResult.HeatIndex}".Dump("Last Temp & Humidity");
                         ex.Dump();
                         await Task.Delay(2000, stoppingToken);
                     }

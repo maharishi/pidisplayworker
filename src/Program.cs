@@ -34,7 +34,7 @@ namespace pidisplayworker
                         Pi.I2C.AddDevice(0x3f);
                         services.AddTransient<string>(url => Properties.Resources.PiHoleURL);
                         services.AddTransient<ILiquidCrystal_I2C>(lcd => new LiquidCrystal_I2C((I2CDevice)Pi.I2C.Devices[0]));
-                        services.AddTransient<IDHT11>(dht => new DHT11(Pi.Gpio[BcmPin.Gpio26], SensorTypes.DHT11));
+                        services.AddTransient<IDHT11>(dht => new DHT11(Pi.Gpio[BcmPin.Gpio26]));
                     }
                     services.AddHostedService<Worker>();
                 });

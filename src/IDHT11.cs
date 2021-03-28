@@ -7,9 +7,6 @@ namespace pidisplayworker
 {
     public interface IDHT11
     {
-        public Task<float> ReadTemperature(bool S);
-
-        public Task<float> ReadHumidity();
-
+        public DHT11Data RetrieveSensorData();
     }
 }
