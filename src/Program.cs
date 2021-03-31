@@ -7,6 +7,8 @@ using Microsoft.Extensions.Hosting;
 using Unosquare.RaspberryIO;
 using Unosquare.RaspberryIO.Abstractions;
 using Unosquare.WiringPi;
+using LCDLibrary;
+using LCDLibrary.Mock;
 
 namespace pidisplayworker
 {
@@ -25,7 +27,7 @@ namespace pidisplayworker
                     if(args != null && args.Length > 0 && args.Contains<string>("debug"))
                     {
                         services.AddTransient(url => args[1]);
-                        services.AddTransient<ILiquidCrystal_I2C>(lcd => new Mock.DummyLiquidCrystal_I2C());
+                        services.AddTransient<ILiquidCrystal_I2C>(lcd => new DummyLiquidCrystal_I2C());
                         services.AddTransient<IDHT11>(dht => new Mock.DummyDHT11());
                     }
                     else

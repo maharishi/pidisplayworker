@@ -10,6 +10,7 @@ using ConsoleDump;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using LCDLibrary;
 
 namespace pidisplayworker
 {
